@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'account',
     'app',
+    'recovery_account', 
 ]
 
 MIDDLEWARE = [

@@ -17,7 +17,6 @@ from .serializer import(
 
 #otp verification
 from .otp_send import send_otp_via_email
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 

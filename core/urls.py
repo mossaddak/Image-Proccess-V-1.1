@@ -5,7 +5,14 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    #account
     path('api/', include("account.urls")),
+
+    #password recovery
     path('api/', include("recovery_account.urls")),
+
+    #app
+    path('api/app/', include("app.urls")),
     
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

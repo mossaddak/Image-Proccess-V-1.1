@@ -31,6 +31,7 @@ class ImageResolutionView(APIView):
 
         print("========================>", request.data)
         serializer = ImageProcessSerializer(data=data)
+        print("IMGdata====================================================>", request.data["input"])
 
         
 
@@ -69,10 +70,10 @@ class ImageResolutionView(APIView):
             LastImg.sharpe_png = f'sharp_proccessed_img{LastImg.pk}.png'
 
             #pdf making==============================================================>
-            img = Image.open(f'media{"/"}proccessed_img{LastImg.pk}.jpg')
+            img = Image.open(request.data["input"])
             R = img.convert('RGB')
             R.save(f'media/filter_img_pdf{LastImg.pk}.pdf')
-            LastImg.filter_img_pdf = f'filter_img_pdf{LastImg.pk}.pdf'
+            LastImg.pdf = f'filter_img_pdf{LastImg.pk}.pdf'
 
 
             #cv2.imshow('Orgiginal', img)

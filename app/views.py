@@ -45,13 +45,13 @@ class ImageResolutionView(APIView):
             print("==================================>",img)
             rows, cols = img.shape[:2]
 
-            #img converting
+            #bilateral filtering
             output_bil = cv2.bilateralFilter(img, 40, 35, 100)
             cv2.imwrite(f'media/proccessed_img{LastImg.pk}.jpg', output_bil)
             cv2.imwrite(f'media/proccessed_img{LastImg.pk}.png', output_bil)
-            
-            LastImg.jpg = f'proccessed_img{LastImg.pk}.jpg'
-            LastImg.png = f'proccessed_img{LastImg.pk}.png'
+            #kernel bluring
+            LastImg.filter_jpg = f'proccessed_img{LastImg.pk}.jpg'
+            LastImg.filter_png = f'proccessed_img{LastImg.pk}.jpg'
 
             #cv2.imshow('Orgiginal', img)
             cv2.waitKey(0)

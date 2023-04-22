@@ -17,6 +17,10 @@ from rest_framework.parsers import MultiPartParser
 import cv2
 import numpy as np
 
+#from rembg import remove
+from PIL import Image
+
+
 
 
 # Create your views here.
@@ -49,9 +53,27 @@ class ImageResolutionView(APIView):
             output_bil = cv2.bilateralFilter(img, 40, 35, 100)
             cv2.imwrite(f'media/proccessed_img{LastImg.pk}.jpg', output_bil)
             cv2.imwrite(f'media/proccessed_img{LastImg.pk}.png', output_bil)
+
             #kernel bluring
             LastImg.filter_jpg = f'proccessed_img{LastImg.pk}.jpg'
             LastImg.filter_png = f'proccessed_img{LastImg.pk}.jpg'
+
+            #sharping=================================================================>
+            #gauusian blur
+            gasusian_blur = cv2.GaussianBlur(img, (7,7), 2)
+            #sharping
+            sharping2 = cv2.addWeighted(img, 1.5, gasusian_blur, -0.5, 1)
+            cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.jpg', sharping2)
+            cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.png', sharping2)
+            LastImg.sharpe_jpg = f'sharp_proccessed_img{LastImg.pk}.jpg'
+            LastImg.sharpe_png = f'sharp_proccessed_img{LastImg.pk}.png'
+
+            #pdf making==============================================================>
+            img = Image.open(f'media{"/"}proccessed_img{LastImg.pk}.jpg')
+            R = img.convert('RGB')
+            R.save(f'media/filter_img_pdf{LastImg.pk}.pdf')
+            LastImg.filter_img_pdf = f'filter_img_pdf{LastImg.pk}.pdf'
+
 
             #cv2.imshow('Orgiginal', img)
             cv2.waitKey(0)

@@ -22,6 +22,7 @@ class ImageProcess(models.Model):
 
 #pdf proccessing===================================================================>
 class PdfToImage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="pdf_to_image")
     input = models.FileField(null=True, blank=True, verbose_name="Input")
     images_zip_file = models.FileField(null=True, blank=True, verbose_name="Images Zip File")
 

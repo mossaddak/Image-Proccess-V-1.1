@@ -4,14 +4,17 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from app.models import (
-    ImageProcess
+    ImageProcess,
+
 )
 from app.serializer import(
-    ImageProcessSerializer
+    ImageProcessSerializer,
+    PdfToImageSerializer
 )
 
 class UserSerializer(ModelSerializer):
     image_to_image = ImageProcessSerializer(many=True, read_only=True)
+    pdf_to_image = PdfToImageSerializer(many=True, read_only=True)
     class Meta:
         #image_to_image = ImageProcessSerializer()
         model = User
@@ -26,6 +29,7 @@ class UserSerializer(ModelSerializer):
             "password",
             "is_superuser",
             "image_to_image",
+            "pdf_to_image",
         )
 
         extra_kwargs = {

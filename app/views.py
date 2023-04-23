@@ -39,6 +39,11 @@ class ImageResolutionView(APIView):
         print("========================>", request.data)
         serializer = ImageProcessSerializer(data=data)
         img_data = request.data["input"]
+        if not img_data:
+            return Response(
+                {
+                    'message': 'Please provide a image file.'
+                }, status=status.HTTP_400_BAD_REQUEST)
         print("IMGdata====================================================>", request.data["input"])
 
         if serializer.is_valid():

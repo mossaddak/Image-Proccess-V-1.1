@@ -5,10 +5,12 @@ from rest_framework import (
 )
 
 from .models import(
-    ImageProcess
+    ImageProcess,
+    PdfToImage
 )
 from .serializer import(
-    ImageProcessSerializer
+    ImageProcessSerializer,
+    PdfToImageSerializer
 )
 import base64
 from rest_framework.parsers import MultiPartParser
@@ -22,6 +24,8 @@ from PIL import Image
 import svgwrite
 import io
 import base64
+import os
+import zipfile
 
 
 
@@ -36,9 +40,6 @@ class ImageResolutionView(APIView):
         serializer = ImageProcessSerializer(data=data)
         img_data = request.data["input"]
         print("IMGdata====================================================>", request.data["input"])
-
-        
-
 
         if serializer.is_valid():
             serializer.save()
@@ -109,3 +110,47 @@ class ImageResolutionView(APIView):
 
 
 
+#pdf manupulation================================================================>
+class PdfToImageView(APIView):
+    parser_classes = (MultiPartParser,)
+    def post(self, request):
+        pdf_file = request.data.get('input', None)
+        if not pdf_file:
+            return Response({'error': 'Please provide a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = PdfToImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            last_pdf = PdfToImage.objects.last()
+            last_pdf_url = last_pdf.input
+            
+
+            poppler_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'poppler-23.01.0', 'Library', 'bin'))
+            pdf_path = last_pdf_url.path
+            saving_folder = "media/"
+            from pdf2image import convert_from_path
+            
+            pages=convert_from_path(pdf_path=pdf_path,poppler_path=poppler_path)
+            print("New Last URL=========================================================>", last_pdf_url)
+            zip_filename = f'new_img{last_pdf.pk}.zip'
+            with zipfile.ZipFile(os.path.join(saving_folder, zip_filename), 'w') as myzip:
+                c=1
+                for page in pages:
+                    img_name = f"img-{c}.png"
+                    with myzip.open(img_name, 'w') as myfile:
+                        page.save(myfile, 'PNG')
+                    c += 1
+
+            last_pdf.images_zip_file = f'new_img{last_pdf.pk}.zip'
+            last_pdf.save()
+            return Response(
+                {
+                    'message': 'PDF to image successfully converted.',
+                    'images':last_pdf.images_zip_file.url
+
+                }, status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            

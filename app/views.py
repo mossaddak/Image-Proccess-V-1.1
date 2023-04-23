@@ -125,6 +125,7 @@ class ImageResolutionView(APIView):
 
                 return Response(
                     {
+                        'message': 'Image successfully processed.',
                         "data":serializer.data[-1]
                     },status=status.HTTP_200_OK
                 )
@@ -136,7 +137,7 @@ class ImageResolutionView(APIView):
             return Response(
                 {
                     "message":"Please log into your account."
-                },status=status.HTTP_400_BAD_REQUEST
+                },status=status.HTTP_400_BAD_REQUEST 
             )
         
 
@@ -146,13 +147,14 @@ class ImageResolutionView(APIView):
 class PdfToImageView(APIView):
     parser_classes = (MultiPartParser,)
     def post(self, request):
+        data = request.data
 
         if request.user.is_authenticated:
             pdf_file = request.data.get('input', None)
             if not pdf_file:
                 return Response({'error': 'Please provide a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = PdfToImageSerializer(data=request.data)
+            serializer = PdfToImageSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
                 last_pdf = PdfToImage.objects.last()
@@ -181,7 +183,9 @@ class PdfToImageView(APIView):
                 return Response(
                     {
                         'message': 'PDF to image successfully converted.',
-                        'images':last_pdf.images_zip_file.url
+                        'data':serializer.data,
+                        'user':request.user.id
+                        
 
                     }, status=status.HTTP_201_CREATED
                 )

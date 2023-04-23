@@ -23,14 +23,14 @@ class UserSerializer(ModelSerializer):
             "email",
             "profile_picture",
             "password",
-            "is_verified",
+            #"is_verified",
             #"image_to_image",
             "is_superuser",
         )
 
         extra_kwargs = {
-           "password": {"write_only":True, "style":{"input_type": "password"} 
-           } 
+           "password": {"write_only":True, "style":{"input_type": "password"}},
+           "is_superuser": {"read_only": True}, 
         }
 
     def validate(self, data):

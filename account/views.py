@@ -146,7 +146,7 @@ class LoginView(APIView):
         
 
 
-# ================================================================>
+#profile ================================================================>
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]

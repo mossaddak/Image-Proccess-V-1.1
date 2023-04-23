@@ -11,6 +11,7 @@ from app.serializer import(
 )
 
 class UserSerializer(ModelSerializer):
+    image_to_image = ImageProcessSerializer(many=True, read_only=True)
     class Meta:
         #image_to_image = ImageProcessSerializer()
         model = User
@@ -23,9 +24,8 @@ class UserSerializer(ModelSerializer):
             "email",
             "profile_picture",
             "password",
-            #"is_verified",
-            #"image_to_image",
             "is_superuser",
+            "image_to_image",
         )
 
         extra_kwargs = {

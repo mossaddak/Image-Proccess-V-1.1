@@ -5,7 +5,7 @@ from account.models import(
 
 #image proccessing================================================================>
 class ImageProcess(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="image_to_image")
     input = models.ImageField(null=True, blank=True, verbose_name="Input")
     filter_jpg = models.ImageField(null=True, blank=True, verbose_name="Filter Jpg")
     filter_png = models.ImageField(null=True, blank=True, verbose_name="Filter Png")

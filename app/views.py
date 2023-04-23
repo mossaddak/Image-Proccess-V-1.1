@@ -19,11 +19,14 @@ import numpy as np
 
 #from rembg import remove
 from PIL import Image
+import svgwrite
+import io
+import base64
 
 
 
 
-# Create your views here.
+# CImage Process==========================================================>
 class ImageResolutionView(APIView):
     parser_classes = (MultiPartParser,)
     def post(self, request):
@@ -31,6 +34,7 @@ class ImageResolutionView(APIView):
 
         print("========================>", request.data)
         serializer = ImageProcessSerializer(data=data)
+        img_data = request.data["input"]
         print("IMGdata====================================================>", request.data["input"])
 
         
@@ -70,11 +74,24 @@ class ImageResolutionView(APIView):
             LastImg.sharpe_png = f'sharp_proccessed_img{LastImg.pk}.png'
 
             #pdf making==============================================================>
-            img = Image.open(request.data["input"])
+            img = Image.open(img_data)
             R = img.convert('RGB')
-            R.save(f'media/filter_img_pdf{LastImg.pk}.pdf')
-            LastImg.pdf = f'filter_img_pdf{LastImg.pk}.pdf'
+            R.save(f'media/new_img_pdf{LastImg.pk}.pdf')
+            LastImg.pdf = f'new_img_pdf{LastImg.pk}.pdf'
 
+
+            # Open the image
+            image = Image.open(img_data)
+
+            # # Convert the image to SVG
+            with io.BytesIO() as buffer:
+                image.save(buffer, format='PNG')
+                image_data = buffer.getvalue()
+                image_base64 = base64.b64encode(image_data).decode('utf-8')
+                svg_data = svgwrite.Drawing(filename=f'media/image{LastImg.pk}.svg')
+                svg_data.add(svgwrite.image.Image(href=f"data:image/png;base64,{image_base64}", insert=(0, 0), size=image.size))
+                svg_data.save()
+                LastImg.svg = f'image{LastImg.pk}.svg'
 
             #cv2.imshow('Orgiginal', img)
             cv2.waitKey(0)
@@ -88,4 +105,7 @@ class ImageResolutionView(APIView):
         
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
 

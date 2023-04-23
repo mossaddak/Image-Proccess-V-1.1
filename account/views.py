@@ -18,6 +18,13 @@ from .serializer import(
 #otp verification
 from .otp_send import send_otp_via_email
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db import IntegrityError
+from rest_framework.permissions import (
+    IsAuthenticated
+)
+from rest_framework_simplejwt.authentication import (
+    JWTAuthentication
+)
 
 
 
@@ -136,3 +143,59 @@ class LoginView(APIView):
                         'message':"something Went Wrong"
                     },status = status.HTTP_400_BAD_REQUEST
                 )
+        
+
+
+# ================================================================>
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        users = User.objects.all()
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    
+    def patch(self, request):
+        try:
+            userid = request.user.id
+            user = User.objects.get(pk=userid)
+            data = request.data
+            serializer = UserSerializer(user, data=data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {
+                        'user': serializer.data,
+                        'message': "Your profile has been updated"
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {
+                        'user': serializer.errors,
+                        'message': "Your profile could not be updated"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        except IntegrityError:
+            return Response(
+                {
+                    'user': None,
+                    'message': "A user with that username already exists"
+                },
+                status=status.HTTP_409_CONFLICT
+            )
+        
+        except Exception as e:
+            print(e)
+            return Response(
+                {
+                    'user': None,
+                    'message': "An error occurred while updating your profile"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            ) 

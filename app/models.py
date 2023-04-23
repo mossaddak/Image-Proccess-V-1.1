@@ -1,7 +1,11 @@
 from django.db import models
+from account.models import(
+    User
+)
 
 #image proccessing================================================================>
 class ImageProcess(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     input = models.ImageField(null=True, blank=True, verbose_name="Input")
     filter_jpg = models.ImageField(null=True, blank=True, verbose_name="Filter Jpg")
     filter_png = models.ImageField(null=True, blank=True, verbose_name="Filter Png")

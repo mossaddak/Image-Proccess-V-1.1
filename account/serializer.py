@@ -3,11 +3,18 @@ from .models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-
+from app.models import (
+    ImageProcess
+)
+from app.serializer import(
+    ImageProcessSerializer
+)
 
 class UserSerializer(ModelSerializer):
     class Meta:
+        #image_to_image = ImageProcessSerializer()
         model = User
+        is_superuser = serializers.BooleanField(read_only=True)
         fields = (
             'id',
             "username",
@@ -17,10 +24,12 @@ class UserSerializer(ModelSerializer):
             "profile_picture",
             "password",
             "is_verified",
+            #"image_to_image",
+            "is_superuser",
         )
 
         extra_kwargs = {
-           "password": {"write_only":True, "style":{"input_type": "password"}
+           "password": {"write_only":True, "style":{"input_type": "password"} 
            } 
         }
 

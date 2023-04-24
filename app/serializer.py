@@ -13,4 +13,4 @@ class ImageProcessSerializer(ModelSerializer):
 class PdfToImageSerializer(ModelSerializer):
     class Meta:
         model = PdfToImage
-        fields = ('id','input',)
+        fields = "__all__"

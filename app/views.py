@@ -20,7 +20,9 @@ from .models import (
 from rest_framework.permissions import (
     IsAuthenticated
 )
-
+from rest_framework_simplejwt.authentication import (
+    JWTAuthentication
+)
 
 #image proccessing
 import cv2
@@ -35,19 +37,21 @@ import os
 import zipfile
 from rembg import remove
 
-
+from django.http import (
+    Http404
+)
 
 
 # CImage Process==========================================================>
 class ImageResolutionView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     parser_classes = (MultiPartParser,)
+
     def post(self, request):
         data = request.data
         print("========================>", request.data)
-        
-
         if request.user.is_authenticated:
-
             serializer = ImageProcessSerializer(data=data)
             img_data = request.data["input"]
             if not img_data:
@@ -66,8 +70,6 @@ class ImageResolutionView(APIView):
                 LastImg.user = request.user
 
                 print("last image=============================", LastImgUrl)
-
-                
                 #image process__________________________________________________
                 img = cv2.imread(LastImg.input.path)
                 print("==================================>",img)
@@ -140,11 +142,74 @@ class ImageResolutionView(APIView):
                 },status=status.HTTP_400_BAD_REQUEST 
             )
         
+    def get(self,request):
+        if request.user.is_superuser:
+            all_proccessed_img = ImageProcess.objects.all()
+            serializer = ImageProcessSerializer(all_proccessed_img, many=True)
+            return Response(
+                {
+                    "data":serializer.data,
+                    "message":"data fetch"
+                }, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message":"You don't have the permission for this."
+                }, status=status.HTTP_403_FORBIDDEN
+            )
+
+
+class AllImgResolutionDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    def get_processed_img(request, pk):
+        try:
+            return ImageProcess.objects.get(pk=pk)
+        except ImageProcess.DoesNotExist:
+            raise Http404
+        
+    def get(self, request, pk):
+        if request.user.is_superuser:
+            processed_img = self.get_processed_img(pk)
+            serializer = ImageProcessSerializer(processed_img)
+            return Response(
+                {
+                    "data":serializer.data,
+                    "message":"data fetch"
+                },status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message":"you don't have permission for this action."
+                },status=status.HTTP_204_NO_CONTENT
+            )
+
+
+    
+    def delete(self, request, pk):
+        if request.user.is_superuser:
+            processed_img = self.get_processed_img(pk).delete()
+            return Response(
+                {
+                    "message":"Item Successfully Deleted."
+                }, status=status.HTTP_204_NO_CONTENT
+            )
+        else:
+            return Response(
+                {
+                    "message":"you don't have permission for this action."
+                }, status=status.HTTP_403_FORBIDDEN
+            )
+        
 
 
 
 #pdf manupulation================================================================>
 class PdfToImageView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     parser_classes = (MultiPartParser,)
     def post(self, request):
         data = request.data
@@ -160,8 +225,6 @@ class PdfToImageView(APIView):
                 last_pdf = PdfToImage.objects.last()
                 last_pdf_url = last_pdf.input
                 last_pdf.user = request.user
-                
-
                 poppler_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'poppler-23.01.0', 'Library', 'bin'))
                 pdf_path = last_pdf_url.path
                 saving_folder = "media/"
@@ -184,9 +247,6 @@ class PdfToImageView(APIView):
                     {
                         'message': 'PDF to image successfully converted.',
                         'data':serializer.data,
-                        'user':request.user.id
-                        
-
                     }, status=status.HTTP_201_CREATED
                 )
             else:
@@ -197,8 +257,67 @@ class PdfToImageView(APIView):
                     "message":"Please log into your account."
                 },status=status.HTTP_400_BAD_REQUEST
             )
+    
+    def get(self,request):
+        if request.user.is_superuser:
+            all_proccessed_img = PdfToImage.objects.all()
+            serializer = PdfToImageSerializer(all_proccessed_img, many=True)
+            
+            return Response(
+                {
+                    "data":serializer.data,
+                    "message":"data fetch"
+                }, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message":"You don't have the permission for this."
+                }, status=status.HTTP_403_FORBIDDEN
+            )
         
 
 
 
-            
+class AllPdfToImageView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    def get_processed_img(request, pk):
+        try:
+            return PdfToImage.objects.get(pk=pk)
+        except PdfToImage.DoesNotExist:
+            raise Http404
+        
+    def get(self, request, pk):
+        if request.user.is_superuser:
+            processed_img = self.get_processed_img(pk)
+            serializer = PdfToImageSerializer(processed_img)
+            return Response(
+                {
+                    "data":serializer.data,
+                    "message":"data fetch"
+                },status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message":"you don't have permission for this action."
+                },status=status.HTTP_204_NO_CONTENT
+            )
+
+
+    
+    def delete(self, request, pk):
+        if request.user.is_superuser:
+            self.get_processed_img(pk).delete()
+            return Response(
+                {
+                    "message":"Item Successfully Deleted."
+                }, status=status.HTTP_204_NO_CONTENT
+            )
+        else:
+            return Response(
+                {
+                    "message":"you don't have permission for this action."
+                }, status=status.HTTP_403_FORBIDDEN
+            )

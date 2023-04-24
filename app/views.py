@@ -40,6 +40,8 @@ from rembg import remove
 from django.http import (
     Http404
 )
+from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ParseError
 
 
 # CImage Process==========================================================>
@@ -68,6 +70,44 @@ class ImageResolutionView(APIView):
                 LastImg = ImageProcess.objects.last()
                 LastImgUrl = LastImg.input.url
                 LastImg.user = request.user
+
+
+                try:
+                    LastImg.business_card = request.data["business_card"]
+                    LastImg.instagram_post = request.data["instagram_post"]
+                    LastImg.instagram_story = request.data["instagram_story"]
+                    LastImg.email_signature = request.data["email_signature"]
+                    LastImg.facebook_cover = request.data["facebook_cover"]
+                    LastImg.letterhead = request.data["letterhead"]
+                    
+                except KeyError as e:
+                    return Response(
+                        {
+                            'error': f'Missing required field: {e}'
+                        }, status=status.HTTP_400_BAD_REQUEST
+                    )
+                except ValidationError as e:
+                    return Response(
+                        {
+                            'error': f'Validation error: {e.message}'
+                        }, status=status.HTTP_400_BAD_REQUEST
+                    )
+                except Exception as e:
+                    return Response(
+                        {
+                            'error': f'Unexpected error: {e}'
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
+
+
+
+
+
+
+
+
+
 
                 print("last image=============================", LastImgUrl)
                 #image process__________________________________________________
@@ -122,6 +162,25 @@ class ImageResolutionView(APIView):
                     LastImg.svg = f'image{LastImg.pk}.svg'
 
                 #cv2.imshow('Orgiginal', img)
+
+                #image resizing==============================================>
+                # try:
+                #     LastImg.business_card = request.data["business_card"]
+                #     LastImg.instagram_post = request.data["instagram_post"]
+                #     LastImg.instagram_story = request.data["instagram_story"]
+                #     LastImg.email_signature = request.data["email_signature"]
+                #     LastImg.facebook_cover = request.data["facebook_cover"]
+                #     LastImg.letterhead = request.data["letterhead"]
+                #     cv2.waitKey(0)
+                #     LastImg.save()
+                # except Exception as e:
+                #     return Response(
+                #     {
+                #         'error': e
+                #     },status=status.HTTP_400_BAD_REQUEST
+                # )
+
+
                 cv2.waitKey(0)
                 LastImg.save()
 
@@ -276,7 +335,7 @@ class PdfToImageView(APIView):
                 }, status=status.HTTP_403_FORBIDDEN
             )
         
-        
+
 class AllPdfToImageView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]

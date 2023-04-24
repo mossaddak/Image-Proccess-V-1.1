@@ -51,6 +51,7 @@ class ImageResolutionView(APIView):
     authentication_classes = [JWTAuthentication]
     parser_classes = (MultiPartParser,)
 
+
     def post(self, request):
         data = request.data
         print("========================>", request.data)
@@ -99,14 +100,6 @@ class ImageResolutionView(APIView):
                             'error': f'Unexpected error: {e}'
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
-
-
-
-
-
-
-
-
 
 
 
@@ -161,25 +154,6 @@ class ImageResolutionView(APIView):
                     svg_data.add(svgwrite.image.Image(href=f"data:image/png;base64,{image_base64}", insert=(0, 0), size=image.size))
                     svg_data.save()
                     LastImg.svg = f'image{LastImg.pk}.svg'
-
-                #cv2.imshow('Orgiginal', img)
-
-                #image resizing==============================================>
-                # try:
-                #     LastImg.business_card = request.data["business_card"]
-                #     LastImg.instagram_post = request.data["instagram_post"]
-                #     LastImg.instagram_story = request.data["instagram_story"]
-                #     LastImg.email_signature = request.data["email_signature"]
-                #     LastImg.facebook_cover = request.data["facebook_cover"]
-                #     LastImg.letterhead = request.data["letterhead"]
-                #     cv2.waitKey(0)
-                #     LastImg.save()
-                # except Exception as e:
-                #     return Response(
-                #     {
-                #         'error': e
-                #     },status=status.HTTP_400_BAD_REQUEST
-                # )
 
 
                 cv2.waitKey(0)

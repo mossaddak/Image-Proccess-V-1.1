@@ -122,7 +122,7 @@ class ImageResolutionView(APIView):
                 #gauusian blur
                 gasusian_blur = cv2.GaussianBlur(img, (7,7), 2)
                 #sharping
-                sharping2 = cv2.addWeighted(img, 1.5, gasusian_blur, -0.5, 1)
+                sharping2 = cv2.addWeighted(img, 3.5, gasusian_blur, -2.5, 0)
                 cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.jpg', sharping2)
                 cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.png', sharping2)
                 LastImg.sharpe_jpg = f'sharp_proccessed_img{LastImg.pk}.jpg'

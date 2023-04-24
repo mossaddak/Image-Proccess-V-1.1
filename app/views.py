@@ -42,6 +42,7 @@ from django.http import (
 )
 from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ParseError
+from pdf2image import convert_from_path
 
 
 # CImage Process==========================================================>
@@ -153,7 +154,7 @@ class ImageResolutionView(APIView):
 
                 # # Convert the image to SVG
                 with io.BytesIO() as buffer:
-                    image.save(buffer, format='PNG')
+                    image.save(buffer, format='PNG') 
                     image_data = buffer.getvalue()
                     image_base64 = base64.b64encode(image_data).decode('utf-8')
                     svg_data = svgwrite.Drawing(filename=f'media/image{LastImg.pk}.svg')
@@ -271,51 +272,45 @@ class PdfToImageView(APIView):
     authentication_classes = [JWTAuthentication]
     parser_classes = (MultiPartParser,)
     def post(self, request):
-        data = request.data
+        if not request.user.is_authenticated:
+            return Response({"message": "Please log into your account."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if request.user.is_authenticated:
-            pdf_file = request.data.get('input', None)
-            if not pdf_file:
-                return Response({'error': 'Please provide a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
+        pdf_file = request.data.get('input', None)
+        if not pdf_file:
+            return Response({'error': 'Please provide a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = PdfToImageSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                last_pdf = PdfToImage.objects.last()
-                last_pdf_url = last_pdf.input
-                last_pdf.user = request.user
-                poppler_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'poppler-23.01.0', 'Library', 'bin'))
-                pdf_path = last_pdf_url.path
-                saving_folder = "media/"
-                from pdf2image import convert_from_path
-                
-                pages=convert_from_path(pdf_path=pdf_path,poppler_path=poppler_path)
-                print("New Last URL=========================================================>", last_pdf_url)
-                zip_filename = f'new_img{last_pdf.pk}.zip'
-                with zipfile.ZipFile(os.path.join(saving_folder, zip_filename), 'w') as myzip:
-                    c=1
-                    for page in pages:
-                        img_name = f"img-{c}.png"
-                        with myzip.open(img_name, 'w') as myfile:
-                            page.save(myfile, 'PNG')
-                        c += 1
+        serializer = PdfToImageSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-                last_pdf.images_zip_file = f'new_img{last_pdf.pk}.zip'
-                last_pdf.save()
-                return Response(
-                    {
-                        'message': 'PDF to image successfully converted.',
-                        'data':serializer.data,
-                    }, status=status.HTTP_201_CREATED
-                )
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(
-                {
-                    "message":"Please log into your account."
-                },status=status.HTTP_400_BAD_REQUEST
-            )
+        # Save PDF file
+        serializer.save(user=request.user)
+        pdf_to_image = serializer.instance
+
+        # Convert PDF to images
+        poppler_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'poppler-23.01.0', 'Library', 'bin'))
+        pdf_path = pdf_to_image.input.path
+        saving_folder = "media/"
+        pages = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
+
+        # Create a ZIP file with the images
+        zip_filename = f'new_img{pdf_to_image.pk}.zip'
+        with zipfile.ZipFile(os.path.join(saving_folder, zip_filename), 'w') as myzip:
+            for i, page in enumerate(pages, start=1):
+                img_name = f"img-{i}.png"
+                with myzip.open(img_name, 'w') as myfile:
+                    page.save(myfile, 'PNG')
+
+        # Save the ZIP file path to the database
+        pdf_to_image.images_zip_file = f'new_img{pdf_to_image.pk}.zip'
+        pdf_to_image.save()
+
+        return Response(
+            {
+                'message': 'PDF to image successfully converted.',
+                'data': serializer.data,
+            }, status=status.HTTP_201_CREATED
+        )
     
     def get(self,request):
         if request.user.is_superuser:

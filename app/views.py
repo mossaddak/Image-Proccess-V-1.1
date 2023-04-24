@@ -276,9 +276,7 @@ class PdfToImageView(APIView):
                 }, status=status.HTTP_403_FORBIDDEN
             )
         
-
-
-
+        
 class AllPdfToImageView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]

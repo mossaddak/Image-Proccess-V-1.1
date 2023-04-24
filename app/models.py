@@ -11,11 +11,19 @@ class ImageProcess(models.Model):
     filter_png = models.ImageField(null=True, blank=True, verbose_name="Filter Png")
     sharpe_jpg = models.ImageField(null=True, blank=True, verbose_name="Sharpe Jpg")
     sharpe_png = models.ImageField(null=True, blank=True, verbose_name="Sharpe Png")
-
     bg_remove = models.ImageField(null=True, blank=True, verbose_name="Background Removed Image")
-
     pdf = models.FileField(blank=True, null=True, verbose_name="Pdf")
     svg = models.FileField(blank=True, null=True, verbose_name="Svg")
+
+    #resizing
+    business_card = models.ImageField(null=True, blank=True)
+    instagram_post = models.ImageField(null=True, blank=True)
+    instagram_story = models.ImageField(null=True, blank=True)
+    email_signature = models.ImageField(null=True, blank=True)
+    facebook_cover = models.ImageField(null=True, blank=True)
+    letterhead = models.ImageField(null=True, blank=True)
+    
+
     def __str__(self):
         return f"{self.pk}"
     

@@ -22,6 +22,11 @@ class ImageProcess(models.Model):
     email_signature = models.ImageField(null=True, blank=True)
     facebook_cover = models.ImageField(null=True, blank=True)
     letterhead = models.ImageField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.business_card:
+            self.business_card = None
+        super().save(*args, **kwargs)
     
 
     def __str__(self):

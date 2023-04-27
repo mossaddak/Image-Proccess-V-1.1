@@ -73,40 +73,15 @@ class ImageResolutionView(APIView):
                 LastImgUrl = LastImg.input.url
                 LastImg.user = request.user
 
+                LastImg.business_card = request.FILES.get('business_card', None)
+                LastImg.instagram_post = request.FILES.get('instagram_post', None)
+                LastImg.instagram_story = request.FILES.get('instagram_story', None)
+                LastImg.email_signature = request.FILES.get('email_signature', None)
+                LastImg.facebook_cover = request.FILES.get('facebook_cover', None)
+                LastImg.letterhead = request.FILES.get('letterhead', None)
 
-                try:
-                    LastImg.business_card = request.data["business_card"]
-                    LastImg.instagram_post = request.data["instagram_post"]
-                    LastImg.instagram_story = request.data["instagram_story"]
-                    LastImg.email_signature = request.data["email_signature"]
-                    LastImg.facebook_cover = request.data["facebook_cover"]
-                    LastImg.letterhead = request.data["letterhead"]
-                    
-                except KeyError as e:
-                    return Response(
-                        {
-                            'error': f'Missing required field: {e}'
-                        }, status=status.HTTP_400_BAD_REQUEST
-                    )
-                except ValidationError as e:
-                    return Response(
-                        {
-                            'error': f'Validation error: {e.message}'
-                        }, status=status.HTTP_400_BAD_REQUEST
-                    )
-                except Exception as e:
-                    return Response(
-                        {
-                            'error': f'Unexpected error: {e}'
-                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-
-
-
-                print("last image=============================", LastImgUrl)
                 #image process__________________________________________________
                 img = cv2.imread(LastImg.input.path)
-                print("==================================>",img)
                 rows, cols = img.shape[:2]
 
                 #bilateral filtering
@@ -116,7 +91,7 @@ class ImageResolutionView(APIView):
 
                 #kernel bluring
                 LastImg.filter_jpg = f'proccessed_img{LastImg.pk}.jpg'
-                LastImg.filter_png = f'proccessed_img{LastImg.pk}.jpg'
+                LastImg.filter_png = f'proccessed_img{LastImg.pk}.png'
 
                 #sharping=================================================================>
                 #gauusian blur
@@ -133,7 +108,6 @@ class ImageResolutionView(APIView):
                 R = img.convert('RGB')
                 R.save(f'media/new_img_pdf{LastImg.pk}.pdf')
                 LastImg.pdf = f'new_img_pdf{LastImg.pk}.pdf'
-
 
                 #background remove ===============================================>
                 img = Image.open(LastImg.input.path)
@@ -154,7 +128,6 @@ class ImageResolutionView(APIView):
                     svg_data.add(svgwrite.image.Image(href=f"data:image/png;base64,{image_base64}", insert=(0, 0), size=image.size))
                     svg_data.save()
                     LastImg.svg = f'image{LastImg.pk}.svg'
-
 
                 cv2.waitKey(0)
                 LastImg.save()

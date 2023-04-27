@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 from .models import(
-    User
+    User,
+    ProfilePicture
 )
 
 
@@ -12,7 +13,8 @@ from .models import(
 from .serializer import(
     UserSerializer,
     VeriFyAccountSerializer,
-    LoginSerializer
+    LoginSerializer,
+    ProfilePictureSerializer
 )
 
 #otp verification
@@ -25,6 +27,18 @@ from rest_framework.permissions import (
 from rest_framework_simplejwt.authentication import (
     JWTAuthentication
 )
+
+from rest_framework.permissions import (
+    BasePermission,
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated,
+)
+
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import (
+    permissions
+)
+
 
 
 
@@ -61,7 +75,6 @@ class SingUp(APIView):
                     
                 )
         
-
 class VerifyOTPview(APIView):
     def post(self, request):
         try:
@@ -120,7 +133,6 @@ class VerifyOTPview(APIView):
         except Exception as e:
             print("Error=======================================", e)
 
-
 class LoginView(APIView):
     def post(self, request):
         try:
@@ -144,8 +156,6 @@ class LoginView(APIView):
                     },status = status.HTTP_400_BAD_REQUEST
                 )
         
-
-
 #profile ================================================================>
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -199,3 +209,26 @@ class ProfileView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 
+
+
+#Profile picture
+
+class ProfilePictureEdit(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS or request.user.is_superuser:
+            return True
+        
+        return obj.user == request.user or request.user.is_staff
+
+
+
+class ProfilePictureView(ModelViewSet):
+
+    serializer_class = ProfilePictureSerializer
+    queryset = ProfilePicture.objects.all()
+
+    authentication_classes=[JWTAuthentication]
+    permission_classes = [ProfilePictureEdit]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

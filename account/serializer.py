@@ -1,5 +1,8 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import (
+    User,
+    ProfilePicture
+)
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -111,3 +114,8 @@ class LoginSerializer(serializers.Serializer):
 
                 }
             }
+
+class ProfilePictureSerializer(ModelSerializer):
+    class Meta:
+        model = ProfilePicture
+        fields = "__all__"

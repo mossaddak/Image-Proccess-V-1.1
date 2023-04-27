@@ -182,4 +182,10 @@ EMAIL_USE_SSL = True#oke
 TIME_ZONE = 'Asia/Dhaka'
 
 
-
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ORIGIN_WHITELIST  = [
+#     "https://example.com",
+#     "https://sub.example.com",
+#     "http://localhost:3000",
+#     "http://127.0.0.1:8000",
+# ]

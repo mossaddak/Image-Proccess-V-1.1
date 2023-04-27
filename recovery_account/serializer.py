@@ -14,8 +14,9 @@ class EmailSerializer(serializers.Serializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     password_reset_token = serializers.CharField()
+    new_password = serializers.CharField()
     class Meta:
-        fields = ("password_reset_token",)
+        fields = ("password_reset_token", "new_password")
 
 
 

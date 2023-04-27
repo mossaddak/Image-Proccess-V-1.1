@@ -31,7 +31,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 import random
-
+from rest_framework.permissions import IsAuthenticated
 
 class PasswordReset(generics.GenericAPIView):
     serializer_class = EmailSerializer
@@ -78,20 +78,28 @@ class PasswordReset(generics.GenericAPIView):
 class ResetPasswordSendTokenApi(generics.GenericAPIView):
 
     serializer_class = ResetPasswordSerializer
-
     def post(self, request, *args, **kwargs):
         
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         password_reset_token = serializer.data["password_reset_token"]
-        user = User.objects.filter(password_reset_token=password_reset_token).first()
+        new_password = serializer.data["new_password"]
 
-        print("Password User========================================>", user)
-        return Response(
-            {
-                "message":"Your token is valid"
-            }
-        )
+        user = User.objects.filter(password_reset_token=password_reset_token).first()
+        if user:
+            user.set_password(new_password)
+            user.save()
+            return Response(
+                {
+                    "message": "Password is changed"
+                }
+            )
+        else:
+            return Response(
+                {
+                    "message": "Invalid token"
+                }
+            )
     
 
 

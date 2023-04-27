@@ -40,6 +40,11 @@ from rest_framework import (
 )
 
 
+class ProfilePictureEdit(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS or request.user.is_superuser:
+            return True
+        return obj.user == request.user or request.user.is_staff
 
 
 # Create your views here.
@@ -157,7 +162,7 @@ class LoginView(APIView):
                 )
         
 #profile ================================================================>
-class ProfileView(APIView):
+class ProfileView(APIView): 
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -209,24 +214,12 @@ class ProfileView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 
-
-
 #Profile picture
-
-class ProfilePictureEdit(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS or request.user.is_superuser:
-            return True
-        
-        return obj.user == request.user or request.user.is_staff
-
 
 
 class ProfilePictureView(ModelViewSet):
-
     serializer_class = ProfilePictureSerializer
     queryset = ProfilePicture.objects.all()
-
     authentication_classes=[JWTAuthentication]
     permission_classes = [ProfilePictureEdit]
 

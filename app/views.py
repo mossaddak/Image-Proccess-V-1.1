@@ -66,19 +66,11 @@ class ImageResolutionView(APIView):
             print("IMGdata====================================================>", request.data["input"])
 
             if serializer.is_valid():
-                serializer.save()
+                #serializer.save()
                 all_images = ImageProcess.objects.all()
                 serializer = ImageProcessSerializer(all_images, many=True)
                 LastImg = ImageProcess.objects.last()
                 LastImgUrl = LastImg.input.url
-                LastImg.user = request.user
-
-                LastImg.business_card = request.FILES.get('business_card', None)
-                LastImg.instagram_post = request.FILES.get('instagram_post', None)
-                LastImg.instagram_story = request.FILES.get('instagram_story', None)
-                LastImg.email_signature = request.FILES.get('email_signature', None)
-                LastImg.facebook_cover = request.FILES.get('facebook_cover', None)
-                LastImg.letterhead = request.FILES.get('letterhead', None)
 
                 #image process__________________________________________________
                 img = cv2.imread(LastImg.input.path)
@@ -89,10 +81,6 @@ class ImageResolutionView(APIView):
                 cv2.imwrite(f'media/proccessed_img{LastImg.pk}.jpg', output_bil)
                 cv2.imwrite(f'media/proccessed_img{LastImg.pk}.png', output_bil)
 
-                #kernel bluring
-                LastImg.filter_jpg = f'proccessed_img{LastImg.pk}.jpg'
-                LastImg.filter_png = f'proccessed_img{LastImg.pk}.png'
-
                 #sharping=================================================================>
                 #gauusian blur
                 gasusian_blur = cv2.GaussianBlur(img, (7,7), 2)
@@ -100,21 +88,16 @@ class ImageResolutionView(APIView):
                 sharping2 = cv2.addWeighted(img, 3.5, gasusian_blur, -2.5, 0)
                 cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.jpg', sharping2)
                 cv2.imwrite(f'media/sharp_proccessed_img{LastImg.pk}.png', sharping2)
-                LastImg.sharpe_jpg = f'sharp_proccessed_img{LastImg.pk}.jpg'
-                LastImg.sharpe_png = f'sharp_proccessed_img{LastImg.pk}.png'
 
                 #pdf making==============================================================>
                 img = Image.open(img_data)
                 R = img.convert('RGB')
                 R.save(f'media/new_img_pdf{LastImg.pk}.pdf')
-                LastImg.pdf = f'new_img_pdf{LastImg.pk}.pdf'
 
                 #background remove ===============================================>
                 img = Image.open(LastImg.input.path)
                 R = remove(img)
                 R.save(f'media/bg_remove{LastImg.pk}.png')
-                LastImg.bg_remove = f'bg_remove{LastImg.pk}.png'
-
 
                 # Open the image
                 image = Image.open(img_data)
@@ -127,10 +110,40 @@ class ImageResolutionView(APIView):
                     svg_data = svgwrite.Drawing(filename=f'media/image{LastImg.pk}.svg')
                     svg_data.add(svgwrite.image.Image(href=f"data:image/png;base64,{image_base64}", insert=(0, 0), size=image.size))
                     svg_data.save()
-                    LastImg.svg = f'image{LastImg.pk}.svg'
 
                 cv2.waitKey(0)
-                LastImg.save()
+                #LastImg.save()
+
+               
+                input = request.data.get('input', None)
+                print("INPUT=======================================new", input)
+
+                #saving data==========================================================>
+                ImageProcess.objects.create(
+                    user = request.user,
+                    input = input,
+                    
+                    #filter
+                    filter_jpg = f'proccessed_img{LastImg.pk}.jpg',
+                    filter_png = f'proccessed_img{LastImg.pk}.png',
+
+                    #sharpe
+                    sharpe_jpg = f'sharp_proccessed_img{LastImg.pk}.jpg',
+                    sharpe_png = f'sharp_proccessed_img{LastImg.pk}.png',
+
+                    pdf = f'new_img_pdf{LastImg.pk}.pdf',
+                    bg_remove = f'bg_remove{LastImg.pk}.png',
+                    svg = f'image{LastImg.pk}.svg',
+
+                    #re-sizing
+                    business_card = request.FILES.get('business_card', None),
+                    instagram_post = request.FILES.get('instagram_post', None),
+                    instagram_story = request.FILES.get('instagram_story', None),
+                    email_signature = request.FILES.get('email_signature', None),
+                    facebook_cover = request.FILES.get('facebook_cover', None),
+                    letterhead = request.FILES.get('letterhead', None)
+
+                )
 
                 return Response(
                     {
@@ -193,8 +206,6 @@ class AllImgResolutionDetailsView(APIView):
                 },status=status.HTTP_204_NO_CONTENT
             )
 
-
-    
     def delete(self, request, pk):
         if request.user.is_superuser:
             processed_img = self.get_processed_img(pk).delete()

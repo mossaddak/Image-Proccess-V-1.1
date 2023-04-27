@@ -31,14 +31,14 @@
                             </h2>
 
                             <div style="margin-top:36px;color:#5A6277;line-height: 24px;">
-                                <span>You have requested to reset your password, Please use the link below to do so.</span>
+                                <span>You have requested to reset your password, Please use the TOKEN below to do so.</span>
                                 </br>
                             </div>
                             
-                            <a href="{{rest_link}}" class="btn"
-                                style="margin-top:36px; width: 200px; border-radius: 8px; display: block; text-decoration: none; background:#fdc841; color:#fff; padding: 12px 24px 12px 24px;">
-                                Reset Password
-                            </a>
+                            <div class="btn"
+                                style="margin-top:36px; width: 200px; border-radius: 8px; display: block; text-decoration: none; background:#000000; color:#FF0000; padding: 12px 24px 12px 24px;">
+                                {{password_reset_token}}
+                            </div>
 
                         </td>
                     </tr>

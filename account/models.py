@@ -9,6 +9,7 @@ class User(AbstractUser):
     profile_picture = models.ImageField(null = True,blank = True,upload_to = "profile-pictures")
     is_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=7, null=True, blank=True)
+    password_reset_token = models.CharField(max_length=10, null=True, blank=True)
     REQUIRES_FIELDS = ["email"]
     objects = CustomeUserManager()
 

@@ -27,60 +27,43 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 
 
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+import random
+
 
 class PasswordReset(generics.GenericAPIView):
-    """
-    Request for Password Reset Link.
-    """
-
     serializer_class = EmailSerializer
 
     def post(self, request):
-        """
-        Create token.
-        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.data["email"]
-
-
-        print("email==============================================", email)
         user = User.objects.filter(email=email).first()
-
-
+ 
         if user:
-            encoded_pk = urlsafe_base64_encode(force_bytes(user.pk))
-            token = PasswordResetTokenGenerator().make_token(user) 
-
-            reset_url = reverse(
-                "reset-password",
-                kwargs={"encoded_pk": encoded_pk, "token": token},
-            )
-
-            rest_link = f"http://127.0.0.1:8000{reset_url}"
+            password_reset_token = random.randint(1,99999934535464646)
+            
             mydict = {
-                'rest_link':rest_link
+                'password_reset_token':password_reset_token
             }
 
             html_template = 'email.html'
             html_message = render_to_string(html_template, context=mydict)
 
-            subject = 'Your forget password link'
-            
+            subject = 'Your forget password token'
             email_from = settings.EMAIL_HOST_USER
-            recipient_list = [email]
-
+            recipient_list = [user.email]
             message = EmailMessage(subject, html_message, email_from, recipient_list)
             message.content_subtype = 'html'
+            user.password_reset_token = password_reset_token
+            user.save()
             message.send()
-
 
             return response.Response(
                 {
-                    "message": "Please check your mail an email is sent.",
-                    "reset_link": rest_link,
-                    "encoded_pk":encoded_pk,
-                    "token":token
+                    "message": "Please check your mail a token is sent."
 
                 },
                 status=status.HTTP_200_OK,
@@ -92,22 +75,23 @@ class PasswordReset(generics.GenericAPIView):
             )
         
 
-class ResetPasswordAPI(generics.GenericAPIView):
-    """
-    Verify and Reset Password Token View.
-    """
+class ResetPasswordSendTokenApi(generics.GenericAPIView):
 
     serializer_class = ResetPasswordSerializer
 
-    def patch(self, request, *args, **kwargs):
-        """
-        Verify token & encoded_pk and then reset the password.
-        """
-        serializer = self.serializer_class(
-            data=request.data, context={"kwargs": kwargs}
-        )
+    def post(self, request, *args, **kwargs):
+        
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return response.Response(
-            {"message": "Password reset complete"},
-            status=status.HTTP_200_OK,
+        password_reset_token = serializer.data["password_reset_token"]
+        user = User.objects.filter(password_reset_token=password_reset_token).first()
+
+        print("Password User========================================>", user)
+        return Response(
+            {
+                "message":"Your token is valid"
+            }
         )
+    
+
+

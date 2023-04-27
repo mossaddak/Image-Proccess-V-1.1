@@ -49,11 +49,31 @@ Note: Here have to pass "username" field for patching
 
 # Image Procesing
 post => http://127.0.0.1:8000/api/app/image-proccess/
+get => http://127.0.0.1:8000/api/app/image-proccess/<id>/
 
 required field: input(form data)
+note: only super admin has permission of GET
 
 # PDF to image
 post => http://127.0.0.1:8000/api/app/pdf-proccess/
-required field
+get => http://127.0.0.1:8000/api/app/pdf-proccess/<id>/
 
-get => 
+required field: input(form data)
+note: only super admin has permission of GET
+
+# Password Required
+post => http://127.0.0.1:8000/api/reset-password/
+
+required field:
+    {
+        "email":"10000mossaddak1@gmail.com"
+    }
+
+# Reset password send token
+post => http://127.0.0.1:8000/api/reset-password/
+
+required field:
+    {
+        "password_reset_token":<here will be the token send by email>,
+        "new_password":12345
+    }

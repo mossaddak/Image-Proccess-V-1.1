@@ -88,10 +88,11 @@ class ResetPasswordSendTokenApi(generics.GenericAPIView):
         user = User.objects.filter(password_reset_token=password_reset_token).first()
         if user:
             user.set_password(new_password)
+            user.password_reset_token = ""
             user.save()
             return Response(
                 {
-                    "message": "Password is changed"
+                    "message": "Successfully password changed"
                 }
             )
         else:

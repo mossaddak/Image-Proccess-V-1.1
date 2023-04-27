@@ -221,7 +221,7 @@ class ProfilePictureView(ModelViewSet):
     serializer_class = ProfilePictureSerializer
     queryset = ProfilePicture.objects.all()
     authentication_classes=[JWTAuthentication]
-    permission_classes = [ProfilePictureEdit]
+    permission_classes = [IsAuthenticated,ProfilePictureEdit]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -8,16 +8,23 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from app.models import (
     ImageProcess,
-
 )
 from app.serializer import(
     ImageProcessSerializer,
     PdfToImageSerializer
 )
+from rest_framework.response import Response
+
+
+class ProfilePictureSerializer(ModelSerializer):
+    class Meta:
+        model = ProfilePicture
+        fields = "__all__"
 
 class UserSerializer(ModelSerializer):
     image_to_image = ImageProcessSerializer(many=True, read_only=True)
     pdf_to_image = PdfToImageSerializer(many=True, read_only=True)
+    profile_picture = ProfilePictureSerializer(many=True, read_only=True)
     class Meta:
         #image_to_image = ImageProcessSerializer()
         model = User
@@ -49,20 +56,16 @@ class UserSerializer(ModelSerializer):
         return data
     
     def create(self, validate_data):
+
+        
         user = User.objects.create(
             username=validate_data["username"],
             first_name=validate_data["first_name"],
             last_name=validate_data["last_name"],
             password=validate_data["password"],
             email=validate_data["email"],
-            profile_picture=validate_data["profile_picture"],
-            
-            
         )
-        print("End User======================", user)
-        #user.set_password(validate_data["password"])
-        user.set_password(validate_data["password"])
-        user.save()
+        
 
         return validate_data
     
@@ -115,7 +118,3 @@ class LoginSerializer(serializers.Serializer):
                 }
             }
 
-class ProfilePictureSerializer(ModelSerializer):
-    class Meta:
-        model = ProfilePicture
-        fields = "__all__"

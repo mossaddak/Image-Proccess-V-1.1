@@ -66,7 +66,7 @@ class ImageResolutionView(APIView):
             print("IMGdata====================================================>", request.data["input"])
 
             if serializer.is_valid():
-                #serializer.save()
+                serializer.save()
                 all_images = ImageProcess.objects.all()
                 serializer = ImageProcessSerializer(all_images, many=True)
                 LastImg = ImageProcess.objects.last()

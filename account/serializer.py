@@ -14,6 +14,7 @@ from app.serializer import(
     PdfToImageSerializer
 )
 from rest_framework.response import Response
+from django.contrib.auth.hashers import check_password
 
 
 class ProfilePictureSerializer(ModelSerializer):
@@ -56,16 +57,19 @@ class UserSerializer(ModelSerializer):
         return data
     
     def create(self, validate_data):
-
-        
         user = User.objects.create(
             username=validate_data["username"],
             first_name=validate_data["first_name"],
             last_name=validate_data["last_name"],
             password=validate_data["password"],
-            email=validate_data["email"],
+            email=validate_data["email"]
+            
+            
         )
-        
+        print("End User======================", user)
+        #user.set_password(validate_data["password"])
+        user.set_password(validate_data["password"])
+        user.save()
 
         return validate_data
     
@@ -95,26 +99,28 @@ class LoginSerializer(serializers.Serializer):
     
     
     def get_jwt_token(self, data):
-
         user = authenticate(username=data['username'], password=data['password'])
-        print("user===========================================", user)
-
         if not user:
             return {
-                'message':'invalid credentials',
-                'data':{}
+                'message': 'Invalid credentials',
+                'data': {}
+            }
+
+        if not check_password(data['password'], user.password):
+            return {
+                'message': 'Invalid credentials',
+                'data': {}
             }
 
         refresh = RefreshToken.for_user(user)
         return { 
-                'message':'Login Success',
-                'data':{
-                    'token':{
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                        "is_superuser":user.is_superuser,
-                    }
-
+            'message': 'Login success',
+            'data': {
+                'token': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'is_superuser': user.is_superuser,
                 }
             }
+        }
 

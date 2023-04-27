@@ -55,3 +55,5 @@ required field: input(form data)
 # PDF to image
 post => http://127.0.0.1:8000/api/app/pdf-proccess/
 required field
+
+get => 

@@ -10,7 +10,12 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=20, null=True, blank=True)
     password_reset_token = models.CharField(max_length=20, null=True, blank=True)
-    REQUIRES_FIELDS = ["email"]
+    is_subscribed = models.BooleanField(default=False)
+
+    USERNAME_FIELD='email'
+    REQUIRED_FIELDS=['first_name', 'last_name', 'username']
+
+
     objects = CustomeUserManager()
 
     def __str__(self):

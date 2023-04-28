@@ -63,14 +63,12 @@ class SingUp(APIView):
                 serializer.save()
                 user = User.objects.all().last()
                 refresh = RefreshToken.for_user(user)
+                serializer = UserSerializer(user).data
                 return Response(
-                    { 
+                    {   
                         'message':"Your account is successfully created",
-                        #'data':serializer.data,
-                        'token':{
-                            'refresh': str(refresh),
-                            'access': str(refresh.access_token),
-                        }
+                        'data':serializer,
+                        'access_token':str(refresh.access_token)
                     },status = status.HTTP_201_CREATED
                 )
         
@@ -150,7 +148,7 @@ class LoginView(APIView):
             if not serializer.is_valid():
                 return Response(
                     {
-                        'data':serializer.errors,
+                        'message':serializer.errors,
                         'message':"something Went Wrong"
                     },status = status.HTTP_400_BAD_REQUEST
                 )
@@ -228,7 +226,11 @@ class ProfilePictureView(ModelViewSet):
     permission_classes = [IsAuthenticated,ProfilePictureEdit]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        # Delete all previous profile pictures of the user
+        ProfilePicture.objects.filter(user=user).delete()
+        # Save the new profile picture
+        serializer.save(user=user)
 
 class VerifiCationOtpSentView(APIView):
     permission_classes = [IsAuthenticated]

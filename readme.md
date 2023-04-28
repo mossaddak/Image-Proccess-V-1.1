@@ -11,11 +11,17 @@ required field:
     }
 
 # Account Verification
-post => http://127.0.0.1:8000/api/account/verify/
-required field:
-    {
-        "otp":"12279"
-    }
+-)First:
+    need to hit this url, user must need loged in:
+    post => http://127.0.0.1:8000/api/account/account-verify-code/
+
+-)Second:
+    then you have to hit the below link with the otp you got in mail 
+    post => http://127.0.0.1:8000/api/account/verify/
+    required field:
+        {
+            "otp":"12279"
+        }
 
 # Login
 post => http://127.0.0.1:8000/api/account/login/

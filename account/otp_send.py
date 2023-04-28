@@ -7,6 +7,8 @@ from .models import (
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.utils.html import strip_tags
+from rest_framework.response import Response
+from rest_framework import status
 
 def send_otp_via_email(email):
     
@@ -22,7 +24,6 @@ def send_otp_via_email(email):
     message = EmailMessage(subject, html_message, email_from, recipient_list)
     message.content_subtype = 'html'
     message.send()
-
     user_obj = User.objects.get(email=email)
     user_obj.otp = otp
     user_obj.save()

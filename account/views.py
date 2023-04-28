@@ -66,7 +66,7 @@ class SingUp(APIView):
                 return Response(
                     { 
                         'message':"Your account is successfully created",
-                        'data':serializer.data,
+                        #'data':serializer.data,
                         'token':{
                             'refresh': str(refresh),
                             'access': str(refresh.access_token),
@@ -238,3 +238,10 @@ class VerifiCationOtpSentView(APIView):
         email = request.user.email
         print("USER email==================================================>", email)
         send_otp_via_email(email)
+
+        return Response(
+            {
+                'message':"Check your mail, OTP is sent."
+            },status = status.HTTP_200_OK
+        
+        )

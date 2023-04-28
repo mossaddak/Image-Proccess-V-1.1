@@ -156,10 +156,6 @@ SIMPLE_JWT = {
 }
 
 
-
-
-
-
 AUTH_USER_MODEL = 'account.User'
 
 #password reset purpose

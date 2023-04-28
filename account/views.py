@@ -121,12 +121,7 @@ class VerifyOTPview(APIView):
                     return Response(
                         {
                             'message':"Your account is verified now.",
-                            'data':serializer.data,
-                            'token':{
-                                'refresh': str(refresh),
-                                'access': str(refresh.access_token),
-                            }
-                            
+                            'access_token':str(refresh.access_token)
                         },status = status.HTTP_201_CREATED
                     )
                 else:
@@ -237,13 +232,25 @@ class VerifiCationOtpSentView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
+        user = request.user
         email = request.user.email
         print("USER email==================================================>", email)
-        send_otp_via_email(email)
+        if user.is_verified == False:
+            user.otp=""
+            user.save()
+            send_otp_via_email(email)
 
-        return Response(
-            {
-                'message':"Check your mail, OTP is sent."
-            },status = status.HTTP_200_OK
-        
-        )
+            return Response(
+                {
+                    'message':"Check your mail, OTP is sent."
+                },status = status.HTTP_200_OK
+            
+            )
+        else:
+            return Response(
+                {
+                    'message':"Your account is already verified."
+                },status = status.HTTP_200_OK
+            
+            )
+

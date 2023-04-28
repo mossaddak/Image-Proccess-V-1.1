@@ -32,6 +32,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 import random
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class PasswordReset(generics.GenericAPIView):
     serializer_class = EmailSerializer
@@ -90,16 +92,19 @@ class ResetPasswordSendTokenApi(generics.GenericAPIView):
             user.set_password(new_password)
             user.password_reset_token = ""
             user.save()
+
+            refresh = RefreshToken.for_user(user)
             return Response(
                 {
-                    "message": "Successfully password changed"
-                }
+                    "message": "Successfully password changed",
+                    'access_token': str(refresh.access_token),
+                },status=status.HTTP_202_ACCEPTED
             )
         else:
             return Response(
                 {
                     "message": "Invalid token"
-                }
+                },status=status.HTTP_400_BAD_REQUEST
             )
     
 

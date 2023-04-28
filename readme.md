@@ -108,3 +108,7 @@ required field:
     then,
 
         security > 2 step verification > sing into your account > App passwords(it will get in bottom) > select app(other) > give a name > click generate
+
+
+# Payment Method
+api_key = sk_test_51Mei6tA4Xf1XOr7ROyXtE7oBA3CUKjMg3jhpbjcc9EgCzFENvPxQfRxe0caqLIvHokpUNwLEazVeJMmkeHgW6G1y00fHxP7I11

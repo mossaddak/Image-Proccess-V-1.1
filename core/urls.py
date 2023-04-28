@@ -14,5 +14,9 @@ urlpatterns = [
 
     #app
     path('api/app/', include("app.urls")),
+
+    #payment
+    path('api/payment-method/', include("payment_method.urls")),
+
     
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

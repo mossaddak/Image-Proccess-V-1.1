@@ -170,7 +170,7 @@ EMAIL_HOST = 'smtp.gmail.com'#oke
 
 EMAIL_PORT = '587'#oke
 EMAIL_HOST_USER = ''#leave here your genuine email
-EMAIL_HOST_PASSWORD = 'ririxuptnpsmfnba'#leave here your genuine password of your email. keep it in mind, as the password should in encrypted condition 
+EMAIL_HOST_PASSWORD = 'zqrgvttkmlpxuqjy'#leave here your genuine password of your email. keep it in mind, as the password should in encrypted condition 
 EMAIL_USE_TLS = True#oke
 
 # wuth custom email

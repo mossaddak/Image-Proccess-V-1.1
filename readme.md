@@ -16,7 +16,7 @@ required field:
     post => http://127.0.0.1:8000/api/account/account-verify-code/
 
 -)Second:
-    then you have to hit the below link with the otp you got in mail 
+    then you have to hit the below link with the otp you got through the email 
     post => http://127.0.0.1:8000/api/account/verify/
     required field:
         {

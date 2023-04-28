@@ -122,7 +122,7 @@ class VerifyOTPview(APIView):
                     refresh = RefreshToken.for_user(user)
                     return Response(
                         {
-                            'message':"Your account is verified now. Wellcome to RVK.",
+                            'message':"Your account is verified now.",
                             'data':serializer.data,
                             'token':{
                                 'refresh': str(refresh),

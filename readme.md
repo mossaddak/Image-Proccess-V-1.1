@@ -5,7 +5,7 @@ required field:
 
     {
         "username":"mossaddak",
-        "email":"10000mossaddak@gmail.com",
+        "email":"demomail@gmail.com",
         "password":"1234",
         "first_name":"Mossaddak",
         "last_name":"Hossain"
@@ -55,7 +55,7 @@ required fields:
         "username": "mossaddak1",
         "first_name": "Mossaddak",
         "last_name": "",
-        "email": "10000mossaddak1@gmail.com"
+        "email": "demomail1@gmail.com"
     }
 
 Note: Here have to pass "username" field for patching
@@ -83,7 +83,7 @@ post => http://127.0.0.1:8000/api/reset-password/
 
 required field:
     {
-        "email":"10000mossaddak1@gmail.com"
+        "email":"demomail1@gmail.com"
     }
 
 # Reset password send token

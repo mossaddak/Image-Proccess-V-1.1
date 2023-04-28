@@ -5,7 +5,8 @@ from .views import(
     VerifyOTPview,
     LoginView,
     ProfileView,
-    ProfilePictureView
+    ProfilePictureView,
+    VerifiCationOtpSentView
 )
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
@@ -18,4 +19,5 @@ urlpatterns = [
     path('account/verify/', VerifyOTPview.as_view()),
     path('account/login/', LoginView.as_view()),
     path('account/profile/', ProfileView.as_view()),
+    path('account/account-verify-code/', VerifiCationOtpSentView.as_view()),
 ]+router.urls

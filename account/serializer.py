@@ -23,11 +23,10 @@ class ProfilePictureSerializer(ModelSerializer):
         fields = "__all__"
 
 class UserSerializer(ModelSerializer):
-    image_to_image = ImageProcessSerializer(many=True, read_only=True)
-    pdf_to_image = PdfToImageSerializer(many=True, read_only=True)
+    # image_to_image = ImageProcessSerializer(many=True, read_only=True)
+    # pdf_to_image = PdfToImageSerializer(many=True, read_only=True)
     profile_picture = ProfilePictureSerializer(many=True, read_only=True)
     class Meta:
-        #image_to_image = ImageProcessSerializer()
         model = User
         is_superuser = serializers.BooleanField(read_only=True)
         fields = (
@@ -39,8 +38,8 @@ class UserSerializer(ModelSerializer):
             "profile_picture",
             "password",
             "is_superuser",
-            "image_to_image",
-            "pdf_to_image",
+            # "image_to_image",
+            # "pdf_to_image",
         )
 
         extra_kwargs = {
@@ -53,7 +52,6 @@ class UserSerializer(ModelSerializer):
         current_user_id = request.user.id if request and request.user else None
         if User.objects.filter(username = data['username']).exclude(id=current_user_id).exists():
              raise serializers.ValidationError("username already exist")
-        
         return data
     
     def create(self, validate_data):
@@ -63,11 +61,7 @@ class UserSerializer(ModelSerializer):
             last_name=validate_data["last_name"],
             password=validate_data["password"],
             email=validate_data["email"]
-            
-            
         )
-        print("End User======================", user)
-        #user.set_password(validate_data["password"])
         user.set_password(validate_data["password"])
         user.save()
 
@@ -116,4 +110,7 @@ class LoginSerializer(serializers.Serializer):
                 }
             }
         }
+    
+
+
 

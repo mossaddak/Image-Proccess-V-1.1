@@ -46,7 +46,6 @@ class ProfilePictureEdit(BasePermission):
             return True
         return obj.user == request.user or request.user.is_staff
 
-
 # Create your views here.
 class SingUp(APIView):
     def post(self, request):
@@ -68,7 +67,6 @@ class SingUp(APIView):
                     { 
                         'message':"Your account is successfully created",
                         'data':serializer.data,
-                        'mail':send_otp_via_email(serializer.data['email']),
                         'token':{
                             'refresh': str(refresh),
                             'access': str(refresh.access_token),
@@ -231,3 +229,12 @@ class ProfilePictureView(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class VerifiCationOtpSentView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        email = request.user.email
+        print("USER email==================================================>", email)
+        send_otp_via_email(email)

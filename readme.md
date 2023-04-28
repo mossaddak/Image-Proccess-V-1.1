@@ -83,3 +83,11 @@ required field:
         "password_reset_token":<here will be the token send by email>,
         "new_password":12345
     }
+
+
+
+# How to create app password?
+=)
+    go to this link: https://myaccount.google.com/?hl=en_GB&utm_source=OGB&utm_medium=act
+    then,
+        security > 2 step verification > sing into your account > App passwords(it will get in bottom) > select app(other) > give a name > click generate

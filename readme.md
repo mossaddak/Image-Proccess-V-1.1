@@ -25,6 +25,7 @@ required field:
     post => http://127.0.0.1:8000/api/account/verify/
 
     required field:
+
         {
             "otp":"12279"
         }
@@ -33,6 +34,7 @@ required field:
 post => http://127.0.0.1:8000/api/account/login/
 
 required fields:
+
     {
         "username":"mossaddak1",
         "password":"1234"
@@ -50,6 +52,7 @@ Note: Authentication Mandetory
 post, patch => http://127.0.0.1:8000/api/account/profile/
 
 required fields:
+
     {
         "id": 16,
         "username": "mossaddak1",

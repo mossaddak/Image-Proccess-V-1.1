@@ -12,7 +12,7 @@ required field:
 
 # Account Verification
 -)First:
-    need to hit this url, user must need loged in:
+    need to hit this url, user must need loged in. there is no need any field. after hit this user will get an otp through the email:
     post => http://127.0.0.1:8000/api/account/account-verify-code/
 
 -)Second:

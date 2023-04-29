@@ -29,7 +29,11 @@ SECRET_KEY = 'django-insecure-)rf=_+sumw5p8h&7)(30n_a7^m6xc(6@noig-kioe#tyvt=egx
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -177,7 +181,7 @@ EMAIL_USE_TLS = True#oke
 TIME_ZONE = 'Asia/Dhaka'
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ORIGIN_WHITELIST  = [
 #     "https://example.com",
 #     "https://sub.example.com",
